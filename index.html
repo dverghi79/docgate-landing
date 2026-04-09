@@ -391,7 +391,7 @@
 
       var utm = getUTMParams();
       var payload = {
-        secret: 'dg_8m3k5n1p7r2q',
+
         product: 'DocGate',
         email: document.getElementById('email').value,
         company: document.getElementById('company').value,
@@ -404,6 +404,15 @@
       Object.assign(payload, utm);
 
       
+      // Google Sheet via server-side proxy (GOOGLE_SHEET_WEBHOOK_URL + SHEET_SECRET in Vercel env)
+      try {
+        await fetch('/api/sheet-notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch(ex) {}
+
       // Slack webhook routed via /api/slack-notify proxy (SLACK_WEBHOOK_URL in Vercel env)
       try {
         await fetch('/api/slack-notify', {
@@ -414,7 +423,6 @@
       } catch(ex) {}
 
       // Google Sheet (TODO: configure DocGate-specific sheet)
-      // var SHEET_WEBHOOK = 'CONFIGURE_DOCGATE_SHEET_WEBHOOK';
 
       // Plausible + gtag
       try { if (window.plausible) window.plausible('Signup', { props: { source: payload.source } }); } catch(ex) {}
