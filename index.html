@@ -340,7 +340,8 @@
         product: 'DocGate',
         email: email,
         first_name: firstName,
-        source: utm.utm_medium || 'direct',
+        source: 'DocGate',
+        traffic_source: utm.utm_source || 'direct',
         submitted_at: new Date().toISOString(),
         page_url: window.location.href
       };
@@ -351,7 +352,7 @@
         await fetch('/api/slack-notify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: '*[DocGate]* New waitlist signup!\n*Email:* ' + email + '\n*Name:* ' + (firstName || 'n/a') + '\n*Source:* ' + payload.source })
+          body: JSON.stringify({ text: '*[DocGate]* New waitlist signup!\n*Email:* ' + email + '\n*Name:* ' + (firstName || 'n/a') + '\n*Product:* DocGate\n*Traffic Source:* ' + (utm.utm_source || 'direct') })
         });
       } catch(ex) {}
 
@@ -374,7 +375,7 @@
       } catch(ex) {}
 
       // Plausible waitlist-signup event
-      try { if (window.plausible) window.plausible('waitlist-signup', { props: { source: payload.source } }); } catch(ex) {}
+      try { if (window.plausible) window.plausible('waitlist-signup', { props: { source: 'DocGate', traffic_source: utm.utm_source || 'direct' } }); } catch(ex) {}
       // Google Ads conversion
       try { if (typeof gtag === 'function') gtag('event', 'conversion', { send_to: 'AW-18071371531/z6DhCLq9-JccEIv-jKlD', value: 1.0, currency: 'USD' }); } catch(ex) {}
 
@@ -382,6 +383,5 @@
       document.getElementById('success-message').style.display = 'block';
     }
   </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
